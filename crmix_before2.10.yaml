@@ -2,7 +2,6 @@
 - name: Déploiement utilisant ansistrano et Docker
   hosts: all
 
-
   tasks:
     - name: include conf vars
       include_vars:

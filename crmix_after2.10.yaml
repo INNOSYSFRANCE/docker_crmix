@@ -1,0 +1,188 @@
+---
+- name: Déploiement utilisant ansistrano et Docker
+  hosts: all
+
+  tasks:
+    - name: include conf vars
+      include_vars:
+        file: "{{ conf_vars_env }}"
+
+## Initialisation du role ansistrano
+
+    - name: include crmix-ansistrano role
+      include_role:
+        name: crmix-ansistrano
+      when: git_pull_deploy
+
+### --- Debut du bloc DOCKER --- ###
+
+    - name: BLOC DOCKER
+      block:
+      - name: DOCKER | Envoie des sources Docker
+        copy:
+          src: "{{ docker_path }}"
+          dest: /home/{{ ansible_user }}/
+
+      - name: DOCKER | Envoie du script vendor_install
+        template:
+          src: templates/vendor_install.sh.j2
+          dest: /home/{{ ansible_user }}/{{ docker_path }}/vendor_install.sh
+          owner: "{{ ansible_user }}"
+
+      - name: DOCKER | définition des droits d'execution du script vendor_install
+        file:
+          path: /home/{{ ansible_user }}/{{ docker_path }}/vendor_install.sh
+          mode: '0700'
+          owner: "{{ ansible_user }}"
+
+      - name: DOCKER | ensure logs directory exists
+        file:
+          path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix-logs
+          mode: '0755'
+          owner: "{{ ansible_user }}"
+          state: directory
+
+      - name: DOCKER | copy de la clef pour innocore
+        copy:
+          src: "{{ innocore_rsa_path }}/{{ innocore_rsa_filename }}"
+          dest: /home/{{ ansible_user }}/{{ docker_path }}/{{ innocore_rsa_filename }}
+          owner: "{{ ansible_user }}"
+          mode: '0600'
+
+  #    - name: DOCKER | Arrêt de l'ancien container
+  #      docker_container:
+  #        name: crmix
+  #        state: stopped
+      - name: DOCKER | Suppression de l'ancien container
+        community.docker.docker_container:
+          name: crmix
+          state: absent
+        when: force_rebuild
+
+  #    - name: DOCKER | Suppression de l'ancienne image
+  #      docker_image:
+  #        state: absent
+  #        name: crmix
+  #        tag: "v1"
+
+      - name: DOCKER | Création de l'image crmix
+        community.docker.docker_image:
+          build:
+            path: /home/{{ ansible_user }}/{{ docker_path }}
+            pull: no
+          name: crmix
+          tag: "v1"
+          source: build
+          force_source: "{{ force_rebuild }}"
+
+## Gestion du script expect ##
+## Afin de réaliser une connection ##
+## avec INNOCORE ##
+
+      - name: EXPECT | Envoie du script expect
+        template:
+          src: templates/expect-ssh-add.j2
+          dest: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/shared/expect-ssh-add
+
+      - name: EXPECT | définition des droits d'execution du script expect
+        file:
+          path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/shared/expect-ssh-add
+          mode: '0700'
+          owner: "{{ ansible_user }}"
+
+      - name: Extraction du thème Metronic
+        unarchive:
+          src: "{{ theme_path_export }}/metronic_v4.7.5.tar.gz"
+          dest: "{{ theme_path }}"
+
+      - name: Creation du Reseau des containeurs
+        community.docker.docker_network:
+          name: "{{ docker_network_name }}"
+          ipam_config:
+            - subnet: "{{ docker_network }}.0/24"
+
+      - name: DOCKER | lancement du container crmix
+        community.docker.docker_container:
+          name: crmix
+          image: crmix:v1
+          state: started
+          recreate: yes
+          volumes:
+            - /home/{{ ansible_user }}/{{ docker_path }}/CRMix:/var/www/html:rw
+            - "{{ theme_path }}/metronic_v4.7.5:/var/www/theme/metronic_v4.7.5:ro"
+            - "{{ amix_document_path }}:{{ amix_document_path }}:rw"
+            - /home/{{ ansible_user }}/{{ docker_path }}/CRMix-logs/apache:/var/log/apache2
+            - /home/{{ ansible_user }}/{{ docker_path }}/CRMix-logs/postfix:/var/log/postfix
+          ports:
+            - "{{ docker_port }}"
+          networks:
+            - name: "{{ docker_network_name }}"
+              ipv4_address: "{{ docker_network }}.{{ docker_address }}"
+        
+      when: rebuild_docker
+### --- Fin du bloc docker --- ###
+
+
+## Reinstallation de composer dans le containeur ##
+## Nécessaire a chaque déploiement ##
+
+    - name: CRMIX | Composer install dans le container
+      command: docker exec crmix /root/vendor_install.sh
+      when: install_vendor
+
+    - name: CRMIX | Suppression de la clef innocore
+      file:
+        state: absent
+        path: /home/{{ ansible_user }}/{{ docker_path }}/{{ innocore_rsa_filename }}
+
+## Le service CRON étant éteins par défault ##
+## il convient de le démarrer ##
+
+    - name: CRMIX | Lancement du service cron
+      command: docker exec crmix service cron start
+
+
+### --- Changement des droits du current pour assurmep --- ###
+    - name: définition des droits du dossier current
+      file:
+        path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/current
+        owner: "{{ ansible_user }}"
+        group: "{{ current_group }}"
+        state: directory
+        recurse: yes
+      become: true
+      ignore_errors: true
+
+### --- Changement des droits pour le dossier exports --- ###
+    - name: définition des droits du dossier exports
+      file:
+        path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/shared/tmp/exports
+        owner: "{{ ansible_user }}"
+        group: "www-data"
+        state: directory
+      become: true
+
+## Nettoyage du cache twig ##
+## A faire impérativement  ##
+### --- Debut du bloc twig --- ###
+
+    - name: Block twig
+      block:
+
+      - name: CRMIX | Refresh twig cache
+        file:
+          path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/shared/tmp/cache/twig
+          state: absent
+
+      - name: CRMIX | recreate twig directory
+        file:
+          path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/shared/tmp/cache/twig
+          state: directory
+          owner: innosys
+          group: www-data
+          mode: '0775'
+      when: refresh_twig
+      become: true
+
+### --- Fin du bloc twig --- ###
+
