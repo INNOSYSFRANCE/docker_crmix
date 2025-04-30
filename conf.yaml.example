@@ -1,32 +1,18 @@
 ---
-### Paramètres DEV
-# db_host_assurmix: 10.90.0.10
-# db_name_assurmix: assurmix
-# db_user_assurmix: dev6
-# db_pass_assurmix: portomix2018
-# env_assurmix: development
-#github_api_token:
-# rollbar_serveur_token: 'abcdefghijklmnopqrstuvwxyz000000'
-# theme_path: /var/www/theme
-# docker_user_id: 1007
-# mail_host: smtp.office365.com
-# mail_port: 587
-# mail_user: sendmailo365@assurmix.fr
-# mail_pwd: 
 
 ### Paramètres PROD
-db_host_assurmix: 10.80.0.10
-db_name_assurmix: assurmix
-db_user_assurmix: crmix
+db_host_assurmix: xx.xx.xx.xx
+db_name_assurmix: truc
+db_user_assurmix: truc
 db_pass_assurmix: 
 env_assurmix: production
 github_api_token:
 rollbar_serveur_token: ''
 theme_path: /var/www/
 docker_user_id: 1000
-mail_host: smtp.office365.com
+mail_host: smtp.com
 mail_port: 587
-mail_user: sendmailo365@assurmix.fr
+mail_user: mail@user.com
 mail_pwd: 
 amix_document_path: /var/www/documents_prod1
 
