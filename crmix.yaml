@@ -45,7 +45,7 @@
 
       - name: DOCKER | copy de la clef pour innocore
         copy:
-          src: "./files/{{ innocore_rsa_filename }}"
+          src: "{{ innocore_rsa_path }}/{{ innocore_rsa_filename }}"
           dest: /home/{{ ansible_user }}/{{ docker_path }}/{{ innocore_rsa_filename }}
           owner: "{{ ansible_user }}"
           mode: '0600'
@@ -106,6 +106,7 @@
             - /home/{{ ansible_user }}/{{ docker_path }}/CRMix-logs/postfix:/var/log/postfix
           ports:
             - 8080:80
+        
       when: rebuild_docker
 ### --- Fin du bloc docker --- ###
 

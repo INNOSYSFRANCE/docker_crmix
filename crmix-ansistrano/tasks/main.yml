@@ -8,4 +8,3 @@
     state: link
     src: "{{ amix_document_path }}"
     dest: "{{ crmix_deploy_to }}/current/documents"
-  when: amix_link
