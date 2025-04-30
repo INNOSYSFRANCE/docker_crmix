@@ -93,8 +93,8 @@
 
       - name: Extraction du thème Metronic
         unarchive:
-          src: "{{ theme_path_export }}"
-          dest: "{{ theme_path }}"
+          src: "{{ theme_path_export }}/metronic_v4.7.5.tar.gz"
+          dest: "{{ theme_path }}/metronic_v4.7.5"
 
       - name: DOCKER | lancement du container crmix
         docker_container:
