@@ -105,7 +105,7 @@
             - /home/{{ ansible_user }}/{{ docker_path }}/CRMix-logs/apache:/var/log/apache2
             - /home/{{ ansible_user }}/{{ docker_path }}/CRMix-logs/postfix:/var/log/postfix
           ports:
-            - 8080:80
+            - "{{ docker_port}}"
         
       when: rebuild_docker
 ### --- Fin du bloc docker --- ###
