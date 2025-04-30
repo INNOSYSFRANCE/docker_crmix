@@ -96,6 +96,12 @@
           src: "{{ theme_path_export }}/metronic_v4.7.5.tar.gz"
           dest: "{{ theme_path }}"
 
+      - name: Creation du Reseau des containeurs
+        docker_network:
+          name: "{{ docker_network_name }}"
+          ipam_config:
+            - subnet: "{{ docker_network }}.0/24"
+
       - name: DOCKER | lancement du container crmix
         docker_container:
           name: crmix
@@ -109,7 +115,10 @@
             - /home/{{ ansible_user }}/{{ docker_path }}/CRMix-logs/apache:/var/log/apache2
             - /home/{{ ansible_user }}/{{ docker_path }}/CRMix-logs/postfix:/var/log/postfix
           ports:
-            - "{{ docker_port}}"
+            - "{{ docker_port }}"
+          networks:
+            - name: "{{ docker_network_name }}"
+              ipv4_address: "{{ docker_network }}.{{ docker_address }}"
         
       when: rebuild_docker
 ### --- Fin du bloc docker --- ###
