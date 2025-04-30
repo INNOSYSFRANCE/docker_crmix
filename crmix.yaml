@@ -91,6 +91,10 @@
           mode: '0700'
           owner: "{{ ansible_user }}"
 
+      - name: Extraction du thème Metronic
+        unarchive:
+          src: "{{ theme_path_export }}"
+          dest: "{{ theme_path }}"
 
       - name: DOCKER | lancement du container crmix
         docker_container:
