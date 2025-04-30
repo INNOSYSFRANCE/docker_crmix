@@ -1,0 +1,14 @@
+---
+- name: ANSISTRANO | Création de .env de recette
+  template:
+    src: env.j2
+    dest: "{{ ansistrano_shared_path }}/.env"
+    owner: "{{ ansible_user }}"
+
+
+
+- name: ANSISTRANO | Creation de tmp
+  file:
+    dest: "{{ ansistrano_shared_path }}/tmp"
+    state: directory
+    mode: '1777'

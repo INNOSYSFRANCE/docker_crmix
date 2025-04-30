@@ -1,0 +1,10 @@
+---
+- name: CRMix | Déploiement
+  include_role:
+        name: ansistrano.deploy
+
+- name: CRMIX | Symlink vers documents Amix
+  file:
+    state: link
+    src: "{{ amix_document_path }}"
+    dest: "{{ crmix_deploy_to }}/current/documents"

@@ -1,0 +1,10 @@
+host github.com
+	StrictHostKeyChecking no
+	user git
+	IdentityFile /root/.ssh/innocore
+host innocoregithub
+	StrictHostKeyChecking no
+	hostname github.com
+	user git
+	IdentityFile /root/.ssh/innocore
+	

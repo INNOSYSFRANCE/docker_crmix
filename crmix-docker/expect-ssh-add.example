@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+spawn ssh-add /root/.ssh/innocore
+expect "Enter passphrase for /root/.ssh/innocore:"
+send "passphrase super sécurisé :) :)\n";
+expect "Identity added: /root/.ssh/innocore (/root/.ssh/innocore)"
+interact

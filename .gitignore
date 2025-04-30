@@ -1,0 +1,13 @@
+.gitconfig
+environments
+group_vars
+vault.pass
+conf-*.yaml
+*.retry
+
+crmix-docker/CRMix
+crmix-docker/innocore
+crmix-docker/expect-ssh-add
+crmix-docker/.env
+
+files/innocore

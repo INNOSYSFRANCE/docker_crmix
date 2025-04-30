@@ -1,0 +1,9 @@
+---
+ansistrano_deploy_via: git
+ansistrano_git_repo: git@github.com:INNOSYSFRANCE/CRMix.git
+ansistrano_allow_anonymous_stats: no
+ansistrano_before_symlink_shared_tasks_file: tasks/before-symlink-shared.yml
+ansistrano_shared_files: ['.env','tmp']
+ansistrano_deploy_to: "{{ crmix_deploy_to }}"
+ansistrano_keep_releases: "{{ crmix_keep_releases }}"
+ansistrano_git_branch: "{{ crmix_branch }}"
