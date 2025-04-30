@@ -6,7 +6,7 @@
   tasks:
     - name: include conf vars
       include_vars:
-        file: ./conf.yaml
+        file: "{{ conf_vars_env }}"
 
 ## Initialisation du role ansistrano
 
