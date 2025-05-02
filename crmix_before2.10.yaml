@@ -95,7 +95,7 @@
           src: "{{ theme_path_export }}/metronic_v4.7.5.tar.gz"
           dest: "{{ theme_path }}"
 
-      - name: Creation du Reseau des containeurs
+      - name: DOCKER | Creation du Reseau des containeurs
         docker_network:
           name: "{{ docker_network_name }}"
           ipam_config:
@@ -143,7 +143,7 @@
 
 
 ### --- Changement des droits du current pour assurmep --- ###
-    - name: définition des droits du dossier current
+    - name: CRMIX | définition des droits du dossier current
       file:
         path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/current
         owner: "{{ ansible_user }}"
@@ -154,7 +154,7 @@
       ignore_errors: true
 
 ### --- Changement des droits pour le dossier exports --- ###
-    - name: définition des droits du dossier exports
+    - name: CRMIX | définition des droits du dossier exports
       file:
         path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/shared/tmp/exports
         owner: "{{ ansible_user }}"

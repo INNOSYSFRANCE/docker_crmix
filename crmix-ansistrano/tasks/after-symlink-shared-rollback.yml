@@ -21,10 +21,3 @@
       remote_src: yes
     when: backup_env_file.stat.exists
     become: true
-
-  - name: CRMIX | ROLLBACK | Changement des droits du dossier current
-    file:
-      path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/current
-      owner: "{{ ansible_user }}"
-      group: "docker"
-      state: directory
