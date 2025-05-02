@@ -1,0 +1,24 @@
+---
+
+  - name: CRMIX | ROLLBACK | Trouver l'ancien .env
+    shell: "find {{ ansistrano_releases_path_rollback }} -maxdepth 1 -mindepth 1 -type d | sort | tail -n 2 | head -n 1"
+    args:
+      executable: /bin/bash
+    register: last_release
+    changed_when: false
+    become: true
+
+  - name: CRMIX | ROLLBACK | Vérifier si le fichier de backup existe
+    stat:
+      path: "{{ ansistrano_shared_path_rollback }}/.env.bak_{{ last_release.stdout | basename }}"
+    register: backup_env_file
+    become: true
+
+  - name: CRMIX | ROLLBACK | Restaurer l'ancien .env
+    copy:
+      src: "{{ ansistrano_shared_path_rollback }}/.env.bak_{{ last_release.stdout | basename }}"
+      dest: "{{ ansistrano_shared_path_rollback }}/.env"
+      remote_src: yes
+    when: backup_env_file.stat.exists
+    become: true
+

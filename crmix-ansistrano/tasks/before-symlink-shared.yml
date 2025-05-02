@@ -1,9 +1,33 @@
 ---
-- name: ANSISTRANO | Création de .env
-  template:
-    src: env.j2
-    dest: "{{ ansistrano_shared_path }}/.env"
-    owner: "{{ ansible_user }}"
+- block:
+  - name: ANSISTRANO | ENV | Verification de l'existance du .env
+    stat:
+      path: "{{ ansistrano_shared_path }}/.env"
+    register: file_stat
+
+
+  - name: ANSISTRANO | ENV | Trouver l'avant-dernière release
+    shell: "find {{ ansistrano_releases_path }} -maxdepth 1 -mindepth 1 -type d | sort | tail -n 2 | head -n 1"
+    args:
+      executable: /bin/bash
+    register: last_release
+    changed_when: false
+
+
+  - name: ANSISTRANO | ENV | Sauvegarde du fichier .env
+    copy:
+      src: "{{ ansistrano_shared_path }}/.env"
+      dest: "{{ ansistrano_shared_path }}/.env.bak_{{ last_release.stdout | basename }}"
+      remote_src: yes
+    when: file_stat.stat.exists
+
+  - name: ANSISTRANO | ENV | Création de .env
+    template:
+      src: env.j2
+      dest: "{{ ansistrano_shared_path }}/.env"
+      owner: "{{ ansible_user }}"
+  when: env_file_rebuild
+
 
 
 - name: ANSISTRANO | Creation de tmp

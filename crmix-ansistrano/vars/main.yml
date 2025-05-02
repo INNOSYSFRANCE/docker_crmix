@@ -7,3 +7,7 @@ ansistrano_shared_files: ['.env','tmp']
 ansistrano_deploy_to: "{{ crmix_deploy_to }}"
 ansistrano_keep_releases: "{{ crmix_keep_releases }}"
 ansistrano_git_branch: "{{ crmix_branch }}"
+ansistrano_rollback_after_symlink_tasks_file: tasks/after-symlink-shared-rollback.yml
+
+ansistrano_releases_path_rollback: "{{ crmix_deploy_to }}/releases"
+ansistrano_shared_path_rollback: "{{ crmix_deploy_to }}/shared"

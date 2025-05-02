@@ -1,11 +1,19 @@
 ---
+- name: CRMIX | correct unsafe git repo error
+  shell: "git config --global --add safe.directory {{ crmix_deploy_to }}/repo"
+
 - name: CRMix | Déploiement
   include_role:
         name: ansistrano.deploy
+  when: ansistrano_status == 'deploy'
+
+- name: CRMIX | ROLLBACK | Lancemen du rôle ansitrano
+  include_role:
+        name: ansistrano.rollback
+  when: ansistrano_status == 'rollback'
 
 - name: CRMIX | Symlink vers documents Amix
   file:
     state: link
     src: "{{ amix_document_path }}"
     dest: "{{ crmix_deploy_to }}/current/documents"
-    force: "{{ amix_force }}"
