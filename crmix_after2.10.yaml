@@ -178,7 +178,7 @@
         file:
           path: /home/{{ ansible_user }}/{{ docker_path }}/CRMix/shared/tmp/cache/twig
           state: directory
-          owner: innosys
+          owner: '{{ ansible_user }}'
           group: www-data
           mode: '0775'
       when: refresh_twig
