@@ -11,3 +11,5 @@ crmix-docker/expect-ssh-add
 crmix-docker/.env
 
 files/innocore
+files/innocore.pub
+files/metronic_v4.7.5.tar.gz
