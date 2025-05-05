@@ -8,11 +8,8 @@
   when: ansistrano_status == 'deploy'
 
 - name: CRMIX | ROLLBACK | Lancement du rôle ansitrano
-  block:
-  - name : Lancement Rollback
-    include_role:
+  include_role:
       name: ansistrano.rollback
-  become: true
   when: ansistrano_status == 'rollback'
 
 - name: CRMIX | Symlink vers documents Amix
