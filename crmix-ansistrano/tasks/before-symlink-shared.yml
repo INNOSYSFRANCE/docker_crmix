@@ -5,14 +5,12 @@
       path: "{{ ansistrano_shared_path }}/.env"
     register: file_stat
 
-
   - name: ANSISTRANO | ENV | Trouver l'avant-dernière release
     shell: "find {{ ansistrano_releases_path }} -maxdepth 1 -mindepth 1 -type d | sort | tail -n 2 | head -n 1"
     args:
       executable: /bin/bash
     register: last_release
     changed_when: false
-
 
   - name: ANSISTRANO | ENV | Sauvegarde du fichier .env
     copy:
@@ -27,8 +25,6 @@
       dest: "{{ ansistrano_shared_path }}/.env"
       owner: "{{ ansible_user }}"
   when: env_file_rebuild
-
-
 
 - name: ANSISTRANO | Creation de tmp
   file:
